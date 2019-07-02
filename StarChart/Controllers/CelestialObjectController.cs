@@ -32,5 +32,33 @@ namespace StarChart.Controllers
             }
             return Ok(item);
         }
+
+        [HttpGet("{name}")]
+        public IActionResult GetByName(string name)
+        {
+            var item = _context.CelestialObjects.FirstOrDefault(c => c.Name == name);
+            if (item == null) return NotFound();
+            var satellites = _context.CelestialObjects.Where(s => s.OrbitedObjectId == item.Id).ToList();
+            if (satellites != null)
+            {
+                item.Satellites = satellites;
+            }
+            return Ok(item);
+        }
+
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            var cObjects = _context.CelestialObjects.ToList();
+            foreach(var c in cObjects)
+            {
+                var satellites = _context.CelestialObjects.Where(s => s.OrbitedObjectId == c.Id).ToList();
+                if (satellites != null)
+                {
+                    c.Satellites = satellites;
+                }
+            }
+            return Ok(cObjects);
+        }
     }
 }
